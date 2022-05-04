@@ -3,6 +3,9 @@ import os
 import json
 import pickle
 import textwrap
+import hashlib
+
+from datetime import datetime as dt, timedelta
 
 from common import logger
 log = logger.make_logger(__name__)
@@ -41,6 +44,10 @@ def date_to_str(date):
     return str(date).replace("-", "")[:8]
 
 
+def today_str():
+    return dt.today().strftime('%Y%m%d')
+
+
 def create_directory(directory):
     try:
         if not os.path.exists(directory):
@@ -76,4 +83,10 @@ def get_all_attr(driver, element):
         element
     )
     return attrs
+
+
+def hash_uid(url):
+    tmp_uid = f'{url}'.encode('utf-8-sig')
+    ret = hashlib.md5(tmp_uid).hexdigest()
+    return ret
 

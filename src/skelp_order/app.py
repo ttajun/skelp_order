@@ -8,7 +8,6 @@ from datetime import datetime as dt, timedelta
 
 from common import args, logger, order, util, const 
 from common import result, selenium, queue, registry
-from board.board_naver_news import BoardNaverNews, SITE_NAVER_NEWS
 log = logger.make_logger(__name__)
 
 
@@ -24,8 +23,7 @@ def main():
     def term_handler(signum, frame):
         log.info(f'>>> INTERRUPT SIGINT !!!. signum: {repr(signum)}')
         cleanup()
-        # res.save_row_part(rows)
-        # ord._save_order()
+        # sel.get_driver().quit()
         exit(1)
 
     signal.signal(signal.SIGINT, term_handler)
@@ -46,7 +44,7 @@ def main():
     end_p = dt.strptime(end, '%Y%m%d')
 
     ##############################
-    ### order
+    ### class
     ##############################
     ord = order.Order(opts_val)
     lev = order.LoopLevel
@@ -77,7 +75,7 @@ def main():
         # sleep(1)
 
         # Board
-        board = reg[SITE_NAVER_NEWS]()
+        board = reg[con.SITE_NAVER_NEWS]()
 
         tmp_p = start_p
         while tmp_p <= end_p:
@@ -98,16 +96,29 @@ def main():
                 for word in search_words:
 
                     if not ord.compare_order_by_list(lev.FOURTH, word, search_words): continue
-                    print(f'> domain: {domain}, date: {str_date}, keyword: {keyword}, word: {word}')
+                    print(f'\n> domain: {domain}, date: {str_date}, keyword: {keyword}, word: {word}')
 
+                    tmp_rows = []
+
+                    # initial task
                     b_info = {}
                     b_info['start_p'] = tmp_p
                     b_info['word'] = word
-
+                    b_info['keyword'] = keyword
+                    b_info['domain'] = domain
                     tmp = board.parse(driver, b_info)
+                    tmp_rows += que.get_result(tmp)
+
+                    # Taks Queue
                     que.push(que.get_tasks(tmp))
                     ret = que.run(sel, reg)
-                    rows += ret
+                    tmp_rows += ret
+
+                    # tmp_rows 사용이유:
+                    # que.run 중간에 인터럽트 발생 시
+                    # rows에 데이터를 더하지 않는다.
+                    # like transaction in DB
+                    rows += tmp_rows
 
                     sleep(1)
 
@@ -117,11 +128,17 @@ def main():
     ##############################
     ### close
     ##############################
-    res.save_row_part(rows)
-    res.save_row_final()
+    if not ord.meta_complete_get():
+        # print(f'+++ rows: {rows}')
+        res.save_row_part(rows)
+        res.save_row_final()
 
-    ord.meta_complete_set(True)
-    ord._save_order()
+        ord.meta_complete_set(True)
+        ord._save_order()
+
+        sel.get_driver().quit()
+    else:
+        log.info(f'+++ Already collected. {ord._get_order()}')
 
     return
 

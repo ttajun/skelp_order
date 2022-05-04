@@ -51,6 +51,7 @@ class TaskQueue:
                 if i.type == TaskResultType.TASK:
                     queue.put(i.result)
                 elif i.type == TaskResultType.ROW:
+                    # print(f'>> {i.result}')
                     rows.append(i.result)
                 else:
                     log.warn(f'Unknown task result type. {i.type}')
@@ -66,4 +67,12 @@ class TaskQueue:
                 ret.append(i.result)
         return ret
 
+
+    def get_result(self, task_result_list):
+        ret = []
+        for i in task_result_list:
+            i:TaskResult
+            if i.type == TaskResultType.ROW:
+                ret.append(i.result)
+        return ret
 

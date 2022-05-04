@@ -22,25 +22,30 @@ class Result:
         return self.result_dir
 
     
-    def save_row_part(self, rows:pd.DataFrame):
+    def save_row_part(self, rows):
+
+        if len(rows) == 0: return
+
         ord = self.order
         base = ord.args_basename_get()
         part = ord.meta_partno_get()
         file = f'{base}.part{part}'
         full = f'{self.get_result_dir()}/{file}'
-        print(f'base: {base}, part: {part}, file: {file}')
+        print('*'*100)
+        # print(f'base: {base}, part: {part}, file: {file}')
+        # print(f'rows: {rows}')
 
-        df = pd.DataFrame(rows, columns=const.Const.DEFAULT_CSV_FIELDS, dtype=const.Const.CSV_FIELD_TYPE)
+        df = pd.DataFrame(rows, columns=const.Const.DEFAULT_CSV_FIELDS)
 
         field = ['title', 'content', 'content2', 'comment', 'script', 'tag']
         df[field] = df[field].applymap(util.remove_comma)
         df[field] = df[field].applymap(util.remove_newline)
 
-        print('*'*100)
         log.info(df[['source_site', 'c_date', 'source_text', 'tag', 'r_cnt', 'title', 'content']].applymap(lambda x: util.short_str(x, 30)))
+        log.info(df['source_text'].value_counts())
         print('*'*100)
         df_size = len(df)
-        print(f'size: {df_size}')
+        # print(f'size: {df_size}')
 
         if df_size > 0:
             df.to_csv(full, index=False, header=False, encoding='utf-8-sig')
@@ -74,7 +79,7 @@ class Result:
         log.info(f'> domains: {domains}')
         for d in domains:
             df_d = df[df['domain'] == d]
-            file = f'{d}_{base}.csv'
+            file = f'{base}.csv'
             df_d.to_csv(file, index=False, header=False, encoding='utf-8-sig')
             log.info(f'>> {d}({len(df_d)}): {file}')
 

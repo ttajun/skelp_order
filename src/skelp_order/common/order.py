@@ -28,7 +28,11 @@ class Order:
             order = new
 
         self.order = order
-        log.info(order)
+        log.info('#'*100)
+        log.info(f'args: {order["args"]}')
+        log.info(f'info: {order["info"]}')
+        log.info(f'meta: {order["meta"]}')
+        log.info('#'*100)
 
 
     def compare_order_by_list(self, level, new, _list:list):
@@ -74,7 +78,7 @@ class Order:
         meta['part_no'] = partno
 
     
-    def meta_partcsv_get(self, csv):
+    def meta_partcsv_get(self):
         meta = self.order['meta']
         return meta['part_csv']
 
@@ -132,7 +136,7 @@ class Order:
         try:
             ret = util.load_pickle(self.order_file_path)
         except Exception as e:
-            log.error(f'{e}')
+            # log.error(f'{e}')
             ret = self._empty_order()
         return ret
 
@@ -143,6 +147,10 @@ class Order:
             util.save_pickle(self.order, self.order_file_path)
         except Exception as e:
             log.error(f'{e}')
+
+
+    def _get_order(self):
+        return self.order
 
 
     def _empty_order(self):

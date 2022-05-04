@@ -1,5 +1,7 @@
 
-from board.board_naver_news import BoardNaverNews, SITE_NAVER_NEWS
+from common import const
+from board.board_naver_news import BoardNaverNews
 
+con = const.Const
 registry= {}
-registry[SITE_NAVER_NEWS] = BoardNaverNews
+registry[con.SITE_NAVER_NEWS] = BoardNaverNews
