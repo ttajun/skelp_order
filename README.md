@@ -1,20 +1,20 @@
-# bbdr-cshop
+# skelp_order
 
-bbdr-cshop is python exectuable command for shopping-mall crawling.
+skelp_order is python exectuable command for selenium crawling.
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install bbdr-cshop
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install skelp_order
 
 ```bash
-pip install bbdr-cshop
+pip install skelp_order
 ```
 
 ## Usage
 
 ```console
 # execute
-[user@dev]$ bbdr-cshop -h
+[user@dev]$ skelp_order -h
 ```
 
 ## Contributing
